@@ -1,10 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import GuffGaffData from "@/app/GuffGaffdata/guffdata";
 import Navbar from "@/app/components/navbar";
+
+type GuffGaffItem = {
+  id: number;
+  author: string;
+  image: string;
+  content: string;
+};
 
 type GuffGaffProps = {
   noSlice?: boolean;
@@ -15,7 +21,40 @@ export default function GuffGaffMain({
   noSlice = true,
   noNavbar = true,
 }: GuffGaffProps) {
-  const poemsToShow = noSlice ? GuffGaffData.slice(0, 4) : GuffGaffData;
+  const [guffadi, setGuffadi] = useState<GuffGaffItem[]>([]);
+  const [filteredGuffadi, setFilteredGuffadi] = useState<GuffGaffItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/guffadi");
+        if (!res.ok) throw new Error("Failed to fetch Guffadis Guff");
+        const data = await res.json();
+
+        const allGuffadi = data.map((item: any) => ({
+          id: item.id,
+          author: item.author,
+          image: `http://localhost:4000/uploads${item.image}`,
+          content: item.content,
+        }));
+
+        setGuffadi(allGuffadi);
+        setFilteredGuffadi(allGuffadi);
+        setError(null);
+      } catch (err: any) {
+        console.error("❌ Error fetching products:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchItems();
+  }, []);
+
+  const poemsToShow = noSlice ? filteredGuffadi.slice(0, 4) : filteredGuffadi;
 
   return (
     <>
@@ -26,7 +65,15 @@ export default function GuffGaffMain({
             Chiya Khasauli Guff Gaff
           </h1>
 
-          {poemsToShow.length === 0 ? (
+          {loading ? (
+            <div className="text-center text-gray-600 text-lg py-10">
+              Loading...
+            </div>
+          ) : error ? (
+            <div className="text-center text-red-600 text-lg py-10">
+              {error}
+            </div>
+          ) : poemsToShow.length === 0 ? (
             <div className="text-center text-gray-600 text-lg py-10">
               No guff gaff entries found.
             </div>

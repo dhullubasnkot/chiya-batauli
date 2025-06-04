@@ -1,35 +1,50 @@
 import Image from "next/image";
-import GuffGaffData from "@/app/GuffGaffdata/guffdata";
 import Navbar from "@/app/components/navbar";
-import Link from "next/link";
 import Footer from "@/app/components/footer";
+import Link from "next/link";
 
+// Define types
 type Poem = {
-  id: string | number;
+  id: number;
   author: string;
   image: string;
   content: string;
 };
 
 type Props = {
-  params: Promise<{
+  params: {
     name: string;
-  }>;
+  };
 };
 
-// Mark component async
 export default async function AuthorPoemsPage({ params }: Props) {
-  // Await params before use
-  const resolvedParams = await params;
-  const decodedName = decodeURIComponent(resolvedParams.name);
+  const decodedName = decodeURIComponent(params.name);
 
-  const poemsByAuthor: Poem[] = GuffGaffData.filter(
-    (poem: Poem) => poem.author === decodedName
-  );
+  // Fetch all poems (if your API supports filtering by author, that's more efficient)
+  const res = await fetch("http://localhost:4000/guffadi", {
+    cache: "no-store",
+  });
 
-  const similarPoems: Poem[] = GuffGaffData.filter(
-    (poem: Poem) => poem.author !== decodedName
-  ).slice(0, 3);
+  if (!res.ok) {
+    return (
+      <div className="text-center text-red-600 py-10">
+        Failed to fetch guff gaff data.
+      </div>
+    );
+  }
+
+  const allPoems: Poem[] = await res.json();
+
+  // Format image URLs
+  const poems = allPoems.map((poem) => ({
+    ...poem,
+    image: `http://localhost:4000/uploads${poem.image}`,
+  }));
+
+  const poemsByAuthor = poems.filter((poem) => poem.author === decodedName);
+  const similarPoems = poems
+    .filter((poem) => poem.author !== decodedName)
+    .slice(0, 3);
 
   if (poemsByAuthor.length === 0) {
     return (

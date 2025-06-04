@@ -24,14 +24,18 @@ export default function Navbar() {
     description: string;
     isAvailable?: boolean;
   };
-  const [products, setProducts] = useState<Product[]>([]);
+  const [menu, setMenu] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [desktopDropdown, setDesktopDropdown] = useState<"menu" | null>(null);
+  const [desktopDropdown, setDesktopDropdown] = useState<
+    "menu" | "guffgaff" | null
+  >(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   // const [mobileDropdown, setMobileDropdown] = useState<null | string>(null);
-  const [filteredHotels, setFilteredHotels] = useState();
+  const [filteredHotels, setFilteredHotels] = useState<Product[] | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -48,50 +52,54 @@ export default function Navbar() {
     };
   }, []);
   // Fetch items from API
-  useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const res = await fetch("http://localhost:4000/items");
-        if (!res.ok) throw new Error("Failed to fetch products");
-        const data = await res.json();
+  const fetchItems = async () => {
+    try {
+      const res = await fetch("http://localhost:4000/items");
+      if (!res.ok) throw new Error("Failed to fetch Menu");
+      const data = await res.json();
 
-        const allItems = data.map((item: any) => ({
-          ...item,
-          image: `http://localhost:4000/uploads${item.image}`,
-        }));
+      const allItems = data.map((item: any) => ({
+        ...item,
+        image: `http://localhost:4000/uploads${item.image}`,
+      }));
 
-        setProducts(allItems);
-        setFilteredHotels(allItems);
-        setError(null);
-      } catch (err: any) {
-        console.error("❌ Error fetching products:", err);
+      setMenu(allItems);
+      setFilteredHotels(allItems);
+      setError(null);
+    } catch (err: unknown) {
+      console.error("❌ Error fetching menu:", err);
+      if (err instanceof Error) {
         setError(err.message);
-      } finally {
-        setLoading(false);
+      } else {
+        setError("An unknown error occurred");
       }
-    };
-
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchItems();
   }, []);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.toLowerCase();
     setSearchQuery(query);
-    if (query.trim() === "") {
-      setFilteredHotels(all);
-      return;
-    }
+    // if (query.trim() === "") {
+    //   setFilteredHotels(menu);
+    //   return;
+    // }
 
-    const results = products.filter(
-      (item) =>
-        item.name.toLowerCase().includes(query) ||
-        item.category.toLowerCase().includes(query) ||
-        (item.ingredients || []).some((i: string) =>
-          i.toLowerCase().includes(query)
-        )
-    );
+    // const results = menu.filter(
+    //   (item) =>
+    //     item.name.toLowerCase().includes(query) ||
+    //     item.category.toLowerCase().includes(query) ||
+    //     (item.ingredients || []).some((i: string) =>
+    //       i.toLowerCase().includes(query)
+    //     )
+    // );
 
-    setFilteredHotels(results);
+    // setFilteredHotels(results);
+    fetchItems();
   };
 
   return (
@@ -127,25 +135,25 @@ export default function Navbar() {
               size={16}
               className="absolute left-3 top-3 text-gray-500 dark:text-gray-400"
             />
-            {searchQuery && filteredHotels.length > 0 && (
+            {searchQuery && filteredHotels && filteredHotels.length > 0 && (
               <ul className="absolute bg-white dark:bg-gray-800 shadow-lg rounded-md w-full mt-1 z-50 max-h-64 overflow-y-auto">
-                {filteredHotels.map((products: Product) => (
+                {(filteredHotels as Product[]).map((menu: Product) => (
                   <li
-                    key={products.id}
+                    key={menu.id}
                     className="p-3 text-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center gap-2"
                   >
                     <Link
-                      href={`/items/${products.id}`}
+                      href={`/items/${menu.id}`}
                       className="flex items-center gap-2"
                     >
                       <Image
-                        src={products.image}
-                        alt={products.name}
+                        src={menu.image}
+                        alt={menu.name}
                         width={40}
                         height={40}
                         className="rounded-md shadow-md object-cover"
                       />
-                      <span>{products.name}</span>
+                      <span>{menu.name}</span>
                     </Link>
                   </li>
                 ))}
@@ -252,12 +260,46 @@ export default function Navbar() {
           >
             Gallery
           </Link>
-          <Link
-            href="/pages/GuffGafnew"
-            className="hover:text-amber-600 transition-colors duration-300"
-          >
-            Guff Gaff
-          </Link>
+          <div className="relative">
+            <button
+              onClick={() =>
+                setDesktopDropdown(
+                  desktopDropdown === "guffgaff" ? null : "guffgaff"
+                )
+              }
+              className="flex items-center gap-1 hover:text-amber-600 transition-colors duration-300 focus:outline-none"
+            >
+              Guff Gaff <ChevronDown size={18} className="mt-0.5" />
+            </button>
+            <AnimatePresence>
+              {desktopDropdown === "guffgaff" && (
+                <motion.ul
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute left-0 mt-3 w-48 bg-white shadow-xl rounded-lg border border-gray-100 z-50 py-2"
+                >
+                  <li>
+                    <Link
+                      href="/pages/GuffGafnew"
+                      className="flex items-center p-3 hover:bg-gray-50 cursor-pointer text-gray-800 hover:text-amber-600 transition-colors duration-200"
+                    >
+                      Kura Haru
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/shareguff"
+                      className="flex items-center p-3 hover:bg-gray-50 cursor-pointer text-gray-800 hover:text-amber-600 transition-colors duration-200"
+                    >
+                      Kurauteee
+                    </Link>
+                  </li>
+                </motion.ul>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Hamburger */}
@@ -295,7 +337,7 @@ export default function Navbar() {
                 className="absolute left-3 top-3 text-gray-500"
                 size={16}
               />
-              {searchQuery && filteredHotels.length > 0 && (
+              {searchQuery && filteredHotels && filteredHotels.length > 0 && (
                 <ul className="absolute bg-white shadow-md rounded-md w-full mt-1 z-50 max-h-64 overflow-y-auto">
                   {filteredHotels.map((chiya) => (
                     <li key={chiya.id} className="p-3 hover:bg-gray-200">

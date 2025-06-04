@@ -1,9 +1,20 @@
+"use client";
 import Footer from "@/app/components/footer";
 import Template from "@/app/components/ItemsTemplate/template";
 import Navbar from "@/app/components/navbar";
 import { useState, useEffect } from "react";
+
+// Define the Item type if not already defined elsewhere
+type Item = {
+  id: number;
+  name: string;
+  category: string;
+  image: string;
+  // Add other fields as needed
+};
+
 export default function Roti() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Item[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -15,11 +26,11 @@ export default function Roti() {
         }
         return res.json();
       })
-      .then((data) => {
+      .then((data: Item[]) => {
         // ✅ Filter Momo items and attach uploads path
         const momoItems = data
-          .filter((item: any) => item.category === "Roti")
-          .map((item: any) => ({
+          .filter((item: Item) => item.category === "Roti")
+          .map((item: Item) => ({
             ...item,
             image: `http://localhost:4000/uploads${item.image}`,
           }));
