@@ -58,7 +58,7 @@ export default function Navbar() {
       if (!res.ok) throw new Error("Failed to fetch Menu");
       const data = await res.json();
 
-      const allItems = data.map((item: any) => ({
+      const allItems = data.map((item: Product) => ({
         ...item,
         image: `http://localhost:4000/uploads${item.image}`,
       }));
@@ -78,6 +78,31 @@ export default function Navbar() {
     }
   };
   useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const res = await fetch("http://localhost:4000/items");
+        if (!res.ok) throw new Error("Failed to fetch Menu");
+        const data = await res.json();
+
+        const allItems = data.map((item: Product) => ({
+          ...item,
+          image: `http://localhost:4000/uploads${item.image}`,
+        }));
+
+        setMenu(allItems);
+        setFilteredHotels(allItems);
+        setError(null);
+      } catch (err: unknown) {
+        console.error("❌ Error fetching menu:", err);
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchItems();
   }, []);
 
@@ -107,11 +132,11 @@ export default function Navbar() {
       <div className="flex justify-between items-center max-w-7xl mx-auto py-4 px-6">
         <Link href="/" className="flex items-center gap-2">
           <Image
-            src="/chiya.png"
+            src="/chiyabatauli.png"
             alt="Logo"
-            width={80}
-            height={80}
-            className="rounded-full shadow-sm"
+            width={90}
+            height={90}
+            className=""
           />
         </Link>
 

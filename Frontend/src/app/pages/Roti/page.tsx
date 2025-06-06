@@ -6,10 +6,11 @@ import { useState, useEffect } from "react";
 
 // Define the Item type if not already defined elsewhere
 type Item = {
-  id: number;
+  id: string | number;
   name: string;
-  category: string;
+  price: number;
   image: string;
+  category: string;
   // Add other fields as needed
 };
 

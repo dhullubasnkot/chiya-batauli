@@ -3,8 +3,17 @@ import Footer from "@/app/components/footer";
 import Template from "@/app/components/ItemsTemplate/template";
 import Navbar from "@/app/components/navbar";
 import { useEffect, useState } from "react";
+type Product = {
+  id: string;
+  name: string;
+  category: string;
+  image: string;
+  price: number; // Add price property
+  [key: string]: unknown;
+};
+
 export default function Chiya() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -16,16 +25,17 @@ export default function Chiya() {
         }
         return res.json();
       })
-      .then((data) => {
-        // ✅ Filter Momo items and attach uploads path
+      .then((data: Product[]) => {
         const momoItems = data
-          .filter((item: any) => item.category === "Tea")
-          .map((item: any) => ({
+          .filter((item: Product) => item.category === "Tea")
+          .map((item: Product) => ({
             ...item,
             image: `http://localhost:4000/uploads${item.image}`,
+            price: typeof item.price === "number" ? item.price : 0, // Ensure price exists
           }));
 
-        setProducts(momoItems);
+        setProducts(momoItems as Product[]);
+        setError(null);
         setError(null);
       })
       .catch((err) => {

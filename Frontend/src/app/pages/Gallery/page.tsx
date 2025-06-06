@@ -10,7 +10,7 @@ export default function Gallery() {
       <Navbar />
       <div className="min-h-screen  p-8 sm:p-12">
         <h1 className="text-4xl font-extrabold text-amber-800 mb-10 text-center drop-shadow-md">
-          Khasauli Gallery
+          Batauli Gallery
         </h1>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {GalleryPrograms.map((program) => (

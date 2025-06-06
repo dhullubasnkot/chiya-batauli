@@ -33,19 +33,30 @@ export default function GuffGaffMain({
         if (!res.ok) throw new Error("Failed to fetch Guffadis Guff");
         const data = await res.json();
 
-        const allGuffadi = data.map((item: any) => ({
-          id: item.id,
-          author: item.author,
-          image: `http://localhost:4000/uploads${item.image}`,
-          content: item.content,
-        }));
+        const allGuffadi = data.map(
+          (item: {
+            id: number;
+            author: string;
+            image: string;
+            content: string;
+          }) => ({
+            id: item.id,
+            author: item.author,
+            image: `http://localhost:4000/uploads${item.image}`,
+            content: item.content,
+          })
+        );
 
         setGuffadi(allGuffadi);
         setFilteredGuffadi(allGuffadi);
         setError(null);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("❌ Error fetching products:", err);
-        setError(err.message);
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred.");
+        }
       } finally {
         setLoading(false);
       }
@@ -62,7 +73,7 @@ export default function GuffGaffMain({
       <section className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 font-inter">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl font-extrabold text-center text-amber-700 mb-12 tracking-tight leading-tight">
-            Chiya Khasauli Guff Gaff
+            Chiya Batauli Guff Gaff
           </h1>
 
           {loading ? (
@@ -99,7 +110,7 @@ export default function GuffGaffMain({
                           {poem.author}
                         </p>
                         <p className="text-sm text-gray-500">
-                          Chiya Khasauli Contributor
+                          Chiya Batauli Contributor
                         </p>
                       </div>
                     </div>

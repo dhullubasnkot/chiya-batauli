@@ -22,7 +22,7 @@ export default function FirstPage() {
         <div className="w-full md:w-1/2 text-center md:text-left">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-800 mb-6 leading-tight">
             Sip, Savor, & Connect at{" "}
-            <span className="text-amber-600">Chiya Khasauli</span>
+            <span className="text-amber-600">Chiya Batauli</span>
           </h1>
           <p className="text-lg text-gray-700 mb-8">
             Discover the rich flavors of Nepali chiya and snacks — the perfect
