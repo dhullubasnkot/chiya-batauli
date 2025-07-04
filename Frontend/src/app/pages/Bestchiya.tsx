@@ -2,10 +2,19 @@
 import Template from "../components/ItemsTemplate/template";
 import { useState, useEffect } from "react";
 
+type Product = {
+  id: string;
+  name: string;
+  category: string;
+  image: string;
+  price: number; // Add price property to match Item type
+  // Add more specific properties here if needed, or remove the index signature entirely
+};
+
 export default function BestChiyaPage() {
-  const [products, setProducts] = useState([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [, setError] = useState<string | null>(null);
+  const [, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("http://localhost:4000/items")
@@ -15,16 +24,17 @@ export default function BestChiyaPage() {
         }
         return res.json();
       })
-      .then((data) => {
-        // ✅ Filter Momo items and attach uploads path
+      .then((data: Product[]) => {
         const momoItems = data
-          .filter((item: any) => item.category === "Tea")
-          .map((item: any) => ({
+          .filter((item: Product) => item.category === "Tea")
+          .map((item: Product) => ({
             ...item,
             image: `http://localhost:4000/uploads${item.image}`,
+            price: item.price ?? 0, // Ensure price is present; default to 0 if missing
           }));
 
         setProducts(momoItems);
+        setError(null);
         setError(null);
       })
       .catch((err) => {
