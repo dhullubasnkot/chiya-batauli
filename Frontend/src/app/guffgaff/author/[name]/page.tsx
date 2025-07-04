@@ -1,9 +1,10 @@
+// src/app/guffgaff/author/[name]/page.tsx
+
 import Image from "next/image";
 import Navbar from "@/app/components/navbar";
 import Footer from "@/app/components/footer";
 import Link from "next/link";
 
-// Define types
 type Poem = {
   id: number;
   author: string;
@@ -12,15 +13,13 @@ type Poem = {
 };
 
 type Props = {
-  params: {
-    name: string;
-  };
+  params: Promise<{ name: string }>; // params is awaited now
 };
 
 export default async function AuthorPoemsPage({ params }: Props) {
-  const decodedName = decodeURIComponent(params.name);
+  const resolvedParams = await params;
+  const decodedName = decodeURIComponent(resolvedParams.name);
 
-  // Fetch all poems (if your API supports filtering by author, that's more efficient)
   const res = await fetch("http://localhost:4000/guffadi", {
     cache: "no-store",
   });
@@ -35,7 +34,6 @@ export default async function AuthorPoemsPage({ params }: Props) {
 
   const allPoems: Poem[] = await res.json();
 
-  // Format image URLs
   const poems = allPoems.map((poem) => ({
     ...poem,
     image: `http://localhost:4000/uploads${poem.image}`,
@@ -147,4 +145,17 @@ export default async function AuthorPoemsPage({ params }: Props) {
       <Footer />
     </>
   );
+}
+
+// generateMetadata with awaited params fix
+export async function generateMetadata(props: {
+  params: Promise<{ name: string }>;
+}) {
+  const params = await props.params;
+  const decodedName = decodeURIComponent(params.name);
+
+  return {
+    title: `Poems by ${decodedName}`,
+    description: `Browse poetic writings contributed by ${decodedName} in GuffGaff.`,
+  };
 }
