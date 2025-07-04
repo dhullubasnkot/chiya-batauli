@@ -24,9 +24,9 @@ export default function Navbar() {
     description: string;
     isAvailable?: boolean;
   };
-  const [menu, setMenu] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setMenu] = useState<Product[]>([]);
+  const [, setLoading] = useState(true);
+  const [, setError] = useState<string | null>(null);
   const [desktopDropdown, setDesktopDropdown] = useState<
     "menu" | "guffgaff" | null
   >(null);
